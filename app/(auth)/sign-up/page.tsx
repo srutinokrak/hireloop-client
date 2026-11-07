@@ -3,14 +3,14 @@ import { AuthForm } from "@/components/auth-form"
 import { authClient } from "@/lib/auth-client"
 
 
-type SignupData = {
+type AuthformData = {
   name: string
   email: string
   password: string
 }
 
 const SignUpPage = () => {
-  const handleSignup = async (data:SignupData) => {
+  const handleSignup = async (data:AuthformData) => {
     const { data:signupResponse, error } = await authClient.signUp.email({
       name: data.name, // required, The name of the user.
       email: data.email, // required, The email address of the user.
