@@ -72,7 +72,7 @@ export function SiteNavbar() {
             <div className="mx-3 h-5 w-px bg-white/15" aria-hidden="true" />
 
             <Link
-              href="/login"
+              href="/sign-in"
               className={cn(
                 buttonVariants({ variant: "ghost" }),
                 "text-primary hover:text-primary"
@@ -82,7 +82,7 @@ export function SiteNavbar() {
             </Link>
 
             <Link
-              href="/register"
+              href="/sign-up"
               className={cn(buttonVariants(), "rounded-xl")}
             >
               Get Started
@@ -132,7 +132,7 @@ export function SiteNavbar() {
 
             <div className="mt-3 flex flex-col gap-2 border-t border-white/10 pt-3">
               <Link
-                href="/login"
+                href="/sign-in"
                 onClick={() => setMenuOpen(false)}
                 className="rounded-lg px-3 py-2 text-sm text-primary hover:bg-white/10"
               >
@@ -140,7 +140,7 @@ export function SiteNavbar() {
               </Link>
 
               <Link
-                href="/register"
+                href="/sign-up"
                 onClick={() => setMenuOpen(false)}
                 className={cn(buttonVariants(), "w-full rounded-xl")}
               >
