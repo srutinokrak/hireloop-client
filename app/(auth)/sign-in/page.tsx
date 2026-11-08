@@ -16,6 +16,7 @@ const SignInPage = () => {
     callbackURL: '/', // An optional URL to redirect to after the user signs in. (optional)
 });
 console.log('suign in response',SignInResponse,error);
+    if (error) throw error; // sends the message to the form to show it
     }
 
     return (

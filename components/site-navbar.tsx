@@ -6,8 +6,9 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { MenuIcon, XIcon } from "lucide-react"
 
-import { buttonVariants } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { useSession, signOut } from "@/lib/auth-client"
 
 const navLinks = [
   { href: "/jobs", label: "Browse Jobs" },
@@ -22,6 +23,13 @@ function isLinkActive(pathname: string, href: string) {
 export function SiteNavbar() {
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
+  const { data: session } = useSession()
+
+  // console.log('use session in navbar',session);
+
+  const handleSignOut = async () => {
+    await signOut()
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full">
@@ -57,9 +65,7 @@ export function SiteNavbar() {
                       aria-current={active ? "page" : undefined}
                       className={cn(
                         "rounded-lg px-2 py-1.5 text-sm transition-colors hover:text-white",
-                        active
-                          ? "font-medium text-white"
-                          : "text-white/70"
+                        active ? "font-medium text-white" : "text-white/70"
                       )}
                     >
                       {link.label}
@@ -71,33 +77,59 @@ export function SiteNavbar() {
 
             <div className="mx-3 h-5 w-px bg-white/15" aria-hidden="true" />
 
-            <Link
-              href="/sign-in"
-              className={cn(
-                buttonVariants({ variant: "ghost" }),
-                "text-primary hover:text-primary"
-              )}
-            >
-              Sign In
-            </Link>
+            {session?.user ? (
+              <>
+                <span className="text-white">welcome, {session.user.name}</span>
+                <Button
+                  onClick={handleSignOut}
+               
+               
+                  className={cn(
+                    buttonVariants({ variant: "ghost" }),
+                    "text-white font-bold hover:text-primary"
+                  )}
+                >
+                  Sign Out
+                </Button>
+                
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/sign-in"
+                  className={cn(
+                    buttonVariants({ variant: "ghost" }),
+                    "text-primary hover:text-primary"
+                  )}
+                >
+                  Sign In
+                </Link>
 
-            <Link
-              href="/sign-up"
-              className={cn(buttonVariants(), "rounded-xl")}
-            >
-              Get Started
-            </Link>
+                <Link
+                  href="/sign-up"
+                  className={cn(buttonVariants(), "rounded-xl")}
+                >
+                  Get Started
+                </Link>
+              </>
+            )}
           </div>
 
           <button
             type="button"
-            aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-label={
+              menuOpen ? "Close navigation menu" : "Open navigation menu"
+            }
             aria-expanded={menuOpen}
             aria-controls="mobile-navigation"
             onClick={() => setMenuOpen((open) => !open)}
             className="inline-flex size-9 items-center justify-center rounded-lg text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white lg:hidden"
           >
-            {menuOpen ? <XIcon aria-hidden="true" /> : <MenuIcon aria-hidden="true" />}
+            {menuOpen ? (
+              <XIcon aria-hidden="true" />
+            ) : (
+              <MenuIcon aria-hidden="true" />
+            )}
           </button>
         </nav>
 

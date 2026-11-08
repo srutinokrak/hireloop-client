@@ -1,22 +1,25 @@
 import { betterAuth } from "better-auth"
 import { MongoClient } from "mongodb"
 import { mongodbAdapter } from "@better-auth/mongo-adapter"
+
 const client = new MongoClient(process.env.BETTER_AUTH_DB_URI as string)
 const db = client.db("hireloopAdmin")
 
 export const auth = betterAuth({
-  //...
-
-  emailAndPassword: {
-    enabled: true,
-  },
+  // Store the role the client sends on sign up ("seeker" | "recruiter" | "admin").
   user: {
     additionalFields: {
       role: {
-        type: ['seeker','recruiter','admin'],
-        input: false,
+        type: "string",
+        required: false,
+        defaultValue: "seeker",
+        input: true, // allow the client to send it
       },
     },
+  },
+
+  emailAndPassword: {
+    enabled: true,
   },
   socialProviders: {
     google: {

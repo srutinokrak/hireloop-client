@@ -15,11 +15,22 @@ const modes = [
 
 type Mode = (typeof modes)[number]["key"]
 
-type AuthformData = {
+// Everything the form collects and hands to the page (name only on sign up,
+// role is "seeker" | "recruiter" | "admin", stays "seeker" on sign in).
+export type AuthFormData = {
   name: string
   email: string
   password: string
+  role: "seeker" | "recruiter" | "admin"
 }
+
+// The pick-a-role pills shown on Sign Up.
+const roleOptions = [
+  { value: "seeker", label: "Seeker" },
+  { value: "recruiter", label: "Recruiter" },
+  { value: "admin", label: "Admin" },
+] as const
+
 // Shared styles for the inputs.
 const inputClass =
   "w-full rounded-xl border border-white/10 bg-[#111112] py-2.5 pr-3 pl-10 text-sm text-foreground outline-none transition-colors focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
@@ -27,22 +38,54 @@ const inputClass =
 const iconClass =
   "pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
 
-export function AuthForm({ mode, onSubmit }: { mode: Mode; onSubmit: (data: AuthformData) => void  | Promise<void>}) {
-  // The form data we collected on submit (just to show it works).
+export function AuthForm({
+  mode,
+  onSubmit,
+}: {
+  mode: Mode
+  onSubmit?: (data: AuthFormData) => Promise<void | { error?: { message?: string | null } }>
+}) {
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
 
-   const [showPassword, setShowPassword] = useState(false)
+  // 1. Collect every input inside the form by its name.
+  function collectFormData(form: HTMLFormElement): AuthFormData {
+    const values = Object.fromEntries(new FormData(form)) as Record<string, string>
 
-  // TODO (later): send this data with better-auth, e.g. authClient.signIn.email(...)
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    return {
+      name: values.name ?? "",
+      email: values.email,
+      password: values.password,
+      role: (values.role ?? "seeker") as AuthFormData["role"], // picked on sign up, "seeker" on sign in
+    }
+  }
+
+  // 2. Hand the data to the page (which sends it to better-auth).
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault() // stop the browser refresh
 
-    // Collect every input inside the form by its name (email, password...).
-  const formData = new FormData(event.currentTarget)
+    setLoading(true)
+    setError(null)
 
-console.log("Form data:")
-formData.forEach((value, key) => {
-  console.log(`${key}:`, value.toString())
-})
+    const data = collectFormData(event.currentTarget)
+    console.log("Form data:", data)
+
+    try {
+      const result = await onSubmit?.(data)
+      // Pages return better-auth's { data, error }, show the error if there is one.
+      if (result?.error?.message) {
+        setError(result.error.message)
+      }
+    } catch (submitError) {
+      setError(
+        submitError instanceof Error
+          ? submitError.message
+          : "Something went wrong, please try again."
+      )
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -120,38 +163,55 @@ formData.forEach((value, key) => {
           </button>
         </div>
 
-        <Button type="submit" size="lg" className="mt-2 w-full rounded-xl">
-          {mode === "signin" ? "Sign In" : "Create Account"}
+        {/* Pick a role (Sign Up only) — hidden radio buttons styled as pills */}
+        {mode === "signup" && (
+          <div>
+            <p className="mb-2 text-sm text-muted-foreground">I am a:</p>
+            <div className="flex gap-1 rounded-xl bg-[#111112] p-1">
+              {roleOptions.map((role) => (
+                <label key={role.value} className="flex-1 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="role"
+                    value={role.value}
+                    defaultChecked={role.value === "seeker"}
+                    className="peer sr-only"
+                  />
+                  <span className="block rounded-lg py-2 text-center text-sm text-muted-foreground transition-colors peer-checked:bg-primary peer-checked:font-medium peer-checked:text-primary-foreground">
+                    {role.label}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <Button type="submit" size="lg" disabled={loading} className="mt-2 w-full rounded-xl">
+          {loading ? "Please wait..." : mode === "signin" ? "Sign In" : "Create Account"}
         </Button>
+
+        {/* Server error message (e.g. "email is already taken") */}
+        {error && <p className="text-xs text-destructive">{error}</p>}
 
         {/* Switch link below the button */}
         <p className="mt-1 text-center text-sm text-muted-foreground">
           {mode === "signin" ? (
             <>
               New to HireLoop?{" "}
-              <Link
-                href="/sign-up"
-                className="text-primary hover:underline"
-              >
+              <Link href="/sign-up" className="text-primary hover:underline">
                 Sign Up
               </Link>
             </>
           ) : (
             <>
               Already have an account?{" "}
-              <Link
-                href="/sign-in"
-                className="text-primary hover:underline"
-              >
+              <Link href="/sign-in" className="text-primary hover:underline">
                 Sign In
               </Link>
             </>
           )}
         </p>
       </form>
-
-      {/* What the handler collected (proof it works) */}
-   
     </div>
   )
 }
