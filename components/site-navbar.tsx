@@ -10,11 +10,7 @@ import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useSession, signOut } from "@/lib/auth-client"
 
-const navLinks = [
-  { href: "/jobs", label: "Browse Jobs" },
-  { href: "/companies", label: "Company" },
-  { href: "/pricing", label: "Pricing" },
-]
+
 
 function isLinkActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`)
@@ -26,6 +22,13 @@ export function SiteNavbar() {
   const { data: session } = useSession()
 
   // console.log('use session in navbar',session);
+
+  const navLinks = [
+  { href: "/jobs", label: "Browse Jobs" },
+  { href: "/companies", label: "Company" },
+  { href: "/pricing", label: "Pricing" },
+  { href: `/dashboard/${session?.user.role || 'seeker'}`, label: "Dashboard" },
+]
 
   const handleSignOut = async () => {
     await signOut()
