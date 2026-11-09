@@ -1,4 +1,4 @@
-"use client"
+
 
 import Link from "next/link"
 import {
@@ -16,106 +16,16 @@ import {
 
 import { Button } from "@/components/ui/button"
 import type { JobDetails } from "./new/page"
+import { getJobs } from "@/lib/api/jobs"
 
 type ManagedJob = JobDetails & {
-  id: string
+  _id: string
   applicants: number
   status: "Active" | "Expired"
   postedAgo: string
 }
 
-const jobs: ManagedJob[] = [
-  {
-    id: "job-1",
-    title: "Frontend Developer",
-    company: "HirePulse Network",
-    category: "Engineering",
-    jobType: "Full-time",
-    remoteWork: true,
-    location: "New York, USA",
-    deadline: "May 30, 2025",
-    minimumSalary: "25",
-    maximumSalary: "40",
-    frequency: "per hour",
-    responsibilities: "Build and maintain user-facing web applications.",
-    qualifications: "Experience with React and TypeScript.",
-    applicants: 34,
-    status: "Active",
-    postedAgo: "Posted 4d ago",
-  },
-  {
-    id: "job-2",
-    title: "Senior Product Designer",
-    company: "HirePulse Labs",
-    category: "Design",
-    jobType: "Full-time",
-    remoteWork: false,
-    location: "London, UK (Hybrid)",
-    deadline: "Jun 14, 2025",
-    minimumSalary: "90000",
-    maximumSalary: "115000",
-    frequency: "per year",
-    responsibilities: "Lead product design from discovery through delivery.",
-    qualifications: "A strong product design portfolio and 5+ years of experience.",
-    applicants: 19,
-    status: "Active",
-    postedAgo: "Posted 1w ago",
-  },
-  {
-    id: "job-3",
-    title: "DevOps Specialist",
-    company: "HirePulse Platform",
-    category: "Infrastructure",
-    jobType: "Full-time",
-    remoteWork: false,
-    location: "Berlin, Germany",
-    deadline: "Jun 30, 2025",
-    minimumSalary: "95000",
-    maximumSalary: "120000",
-    frequency: "per year",
-    responsibilities: "Maintain cloud infrastructure and delivery pipelines.",
-    qualifications: "Experience with cloud platforms and CI/CD.",
-    applicants: 12,
-    status: "Active",
-    postedAgo: "Posted 2w ago",
-  },
-  {
-    id: "job-4",
-    title: "Product Marketing Lead",
-    company: "HirePulse Network",
-    category: "Marketing",
-    jobType: "Full-time",
-    remoteWork: true,
-    location: "EU/US",
-    deadline: "Jul 15, 2025",
-    minimumSalary: "80000",
-    maximumSalary: "105000",
-    frequency: "per year",
-    responsibilities: "Develop go-to-market plans and product messaging.",
-    qualifications: "Experience in product marketing and campaign strategy.",
-    applicants: 27,
-    status: "Active",
-    postedAgo: "Posted 5d ago",
-  },
-  {
-    id: "job-5",
-    title: "QA Automation Engineer",
-    company: "HirePulse Platform",
-    category: "Quality",
-    jobType: "Part-time",
-    remoteWork: false,
-    location: "Dublin, Ireland (Hybrid)",
-    deadline: "May 1, 2025",
-    minimumSalary: "35",
-    maximumSalary: "50",
-    frequency: "per hour",
-    responsibilities: "Create and maintain automated quality checks.",
-    qualifications: "Experience with test automation frameworks.",
-    applicants: 8,
-    status: "Expired",
-    postedAgo: "Closed",
-  },
-]
+
 
 function formatCompensation(job: JobDetails) {
   const { minimumSalary, maximumSalary, frequency } = job
@@ -139,7 +49,10 @@ const categoryStyles: Record<string, string> = {
   Quality: "text-indigo-400",
 }
 
-export default function ManageJobsPage() {
+export default async function ManageJobsPage() {
+
+  const jobs: ManagedJob[]  = await getJobs()
+
   return (
     <main className="min-h-screen bg-background px-4 py-8 text-foreground sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
@@ -181,7 +94,7 @@ export default function ManageJobsPage() {
               </thead>
               <tbody className="divide-y divide-white/5">
                 {jobs.map((job, index) => (
-                  <tr key={job.id} className="text-sm transition-colors hover:bg-white/[0.02]">
+                  <tr key={job._id} className="text-sm transition-colors hover:bg-white/[0.02]">
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-3">
                         <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-white/5 text-primary">
@@ -288,7 +201,7 @@ export default function ManageJobsPage() {
             </table>
           </div>
           <div className="flex items-center justify-between border-t border-white/10 px-4 py-3 text-xs text-muted-foreground">
-            <span>Showing {jobs.length} sample job posts</span>
+          
             <span className="hidden items-center gap-1 sm:flex">
               Demo data <ArrowUpRight aria-hidden="true" className="size-3" />
             </span>
