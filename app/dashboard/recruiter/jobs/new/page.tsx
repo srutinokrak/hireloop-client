@@ -6,6 +6,7 @@ import { ArrowRight, BriefcaseBusiness, CalendarDays, MapPin } from "lucide-reac
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
+import { createJob } from "@/lib/actions/jobs"
 
 const fieldClassName =
   "h-10 border-white/10 bg-[#18181b] text-sm placeholder:text-zinc-500"
@@ -20,17 +21,36 @@ const textareaClassName =
 
 const jobTypes = ["Full-time", "Part-time", "Contract", "Internship"] as const
 
-function handleSubmit(event: FormEvent<HTMLFormElement>) {
+
+export type JobDetails = {
+  title: string
+  company: string
+  category: string
+  jobType: string
+  remoteWork: boolean
+  location: string
+  deadline: string
+  minimumSalary: string
+  maximumSalary: string
+  frequency: string
+  responsibilities: string
+  qualifications: string
+}
+async function handleSubmit(event: FormEvent<HTMLFormElement>) {
   event.preventDefault()
 
   const formData = new FormData(event.currentTarget)
   const jobDetails = {
     ...Object.fromEntries(formData.entries()),
     remoteWork: formData.has("remoteWork"),
-  }
+  } as JobDetails
 
-  console.log("New job details:", jobDetails)
+  // console.log("New job details:", jobDetails)
+
+  const result =await createJob(jobDetails)
+  console.log("createJob result", result);
 }
+
 
 const NewJobsPage = () => {
   return (
