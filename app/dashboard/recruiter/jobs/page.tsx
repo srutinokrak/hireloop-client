@@ -15,7 +15,7 @@ import {
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import type { JobDetails } from "./new/page"
+import type { JobDetails } from "@/lib/types/jobs"
 import { getJobs } from "@/lib/api/jobs"
 import { DeleteJobDialog } from "@/app/components/DeleteJobDialog"
 

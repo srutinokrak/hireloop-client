@@ -1,5 +1,6 @@
 "use client"
-
+import type { JobDetails } from "@/lib/types/jobs"
+import { JobFormField } from "@/app/components/jobs/JobFormField"
 import type { FormEvent } from "react"
 import { BriefcaseBusiness, CalendarDays, MapPin } from "lucide-react"
 
@@ -23,51 +24,31 @@ const textareaClassName =
 
 const jobTypes = ["Full-time", "Part-time", "Contract", "Internship"] as const
 
-export type JobStatus = "Active" | "Expired"
-
-export type JobDetails = {
-  title: string
-  company: string
-  category: string
-  jobType: string
-  remoteWork: boolean
-  location: string
-  deadline: string
-  minimumSalary: string
-  maximumSalary: string
-  frequency: string
-  responsibilities: string
-  qualifications: string
-  applicants: number
-  status: JobStatus
-}
-
-
 const NewJobsPage = () => {
   const router = useRouter()
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-  event.preventDefault()
+    event.preventDefault()
 
-  const formData = new FormData(event.currentTarget)
-  const jobDetails = {
-    ...Object.fromEntries(formData.entries()),
-    remoteWork: formData.has("remoteWork"),
-    applicants: 0,
-    status: "Active",
-  } as JobDetails
+    const formData = new FormData(event.currentTarget)
+    const jobDetails = {
+      ...Object.fromEntries(formData.entries()),
+      remoteWork: formData.has("remoteWork"),
+      applicants: 0,
+      status: "Active",
+    } as JobDetails
 
-  // console.log("New job details:", jobDetails)
+    // console.log("New job details:", jobDetails)
 
-  const result = await createJob(jobDetails)
-  if (result.insertedId) {
-    console.log("createJob result", result)
-    toast.add({
-      title: "Job created",
-      description: "The job has been successfully created",
-    })
-    router.push('/dashboard/recruiter/jobs')
+    const result = await createJob(jobDetails)
+    if (result.insertedId) {
+      console.log("createJob result", result)
+      toast.add({
+        title: "Job created",
+        description: "The job has been successfully created",
+      })
+      router.push("/dashboard/recruiter/jobs")
+    }
   }
-}
   return (
     <main className="min-h-screen bg-background px-4 py-8 text-foreground sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl">
@@ -98,10 +79,7 @@ const NewJobsPage = () => {
               1. Basic Information
             </h2>
             <div className="space-y-5">
-              <div>
-                <label htmlFor="title" className={labelClassName}>
-                  Job Title <span className="text-destructive">*</span>
-                </label>
+              <JobFormField htmlFor="title" label="Job Title" required>
                 <Input
                   id="title"
                   name="title"
@@ -109,7 +87,7 @@ const NewJobsPage = () => {
                   placeholder="e.g. Frontend Developer"
                   className={cn(fieldClassName)}
                 />
-              </div>
+              </JobFormField>
 
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
