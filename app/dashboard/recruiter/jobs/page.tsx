@@ -10,18 +10,18 @@ import {
   MoreVertical,
   Pencil,
   Plus,
-  Trash2,
+  
   Users,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import type { JobDetails } from "./new/page"
 import { getJobs } from "@/lib/api/jobs"
+import { DeleteJobDialog } from "@/app/components/DeleteJobDialog"
 
-type ManagedJob = JobDetails & {
+export type ManagedJob = JobDetails & {
   _id: string
-  applicants: number
-  status: "Active" | "Expired"
+
   postedAgo: string
 }
 
@@ -174,16 +174,7 @@ export default async function ManageJobsPage() {
                           <Pencil aria-hidden="true" />
                           Update
                         </Button>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon-sm"
-                          disabled
-                          aria-label={`Delete ${job.title}`}
-                          className="border-white/10"
-                        >
-                          <Trash2 aria-hidden="true" />
-                        </Button>
+                       <DeleteJobDialog job={job}/>
                         <Button
                           type="button"
                           variant="ghost"

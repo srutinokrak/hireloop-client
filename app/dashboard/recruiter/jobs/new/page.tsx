@@ -1,12 +1,14 @@
 "use client"
 
 import type { FormEvent } from "react"
-import { ArrowRight, BriefcaseBusiness, CalendarDays, MapPin } from "lucide-react"
+import { BriefcaseBusiness, CalendarDays, MapPin } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { createJob } from "@/lib/actions/jobs"
+import { toast } from "@/components/ui/toast"
+import { useRouter } from "next/navigation"
 
 const fieldClassName =
   "h-10 border-white/10 bg-[#18181b] text-sm placeholder:text-zinc-500"
@@ -21,6 +23,7 @@ const textareaClassName =
 
 const jobTypes = ["Full-time", "Part-time", "Contract", "Internship"] as const
 
+export type JobStatus = "Active" | "Expired"
 
 export type JobDetails = {
   title: string
@@ -35,24 +38,36 @@ export type JobDetails = {
   frequency: string
   responsibilities: string
   qualifications: string
+  applicants: number
+  status: JobStatus
 }
-async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+
+
+const NewJobsPage = () => {
+  const router = useRouter()
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
   event.preventDefault()
 
   const formData = new FormData(event.currentTarget)
   const jobDetails = {
     ...Object.fromEntries(formData.entries()),
     remoteWork: formData.has("remoteWork"),
+    applicants: 0,
+    status: "Active",
   } as JobDetails
 
   // console.log("New job details:", jobDetails)
 
-  const result =await createJob(jobDetails)
-  console.log("createJob result", result);
+  const result = await createJob(jobDetails)
+  if (result.insertedId) {
+    console.log("createJob result", result)
+    toast.add({
+      title: "Job created",
+      description: "The job has been successfully created",
+    })
+    router.push('/dashboard/recruiter/jobs')
+  }
 }
-
-
-const NewJobsPage = () => {
   return (
     <main className="min-h-screen bg-background px-4 py-8 text-foreground sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl">
@@ -61,12 +76,13 @@ const NewJobsPage = () => {
             <p className="mb-2 text-xs text-muted-foreground">
               Manage Jobs <span className="px-1">›</span> Create New Listing
             </p>
-            <h1 className="text-2xl font-semibold tracking-tight">Post a New Job</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">
+              Post a New Job
+            </h1>
             <p className="mt-1 text-sm text-muted-foreground">
               Fill in the position specifications to attract qualified talent.
             </p>
           </div>
-   
         </div>
 
         <form
@@ -170,7 +186,9 @@ const NewJobsPage = () => {
             <div className="space-y-5">
               <label className="flex cursor-pointer items-center justify-between gap-4 rounded-lg border border-white/10 bg-[#18181b] p-4">
                 <span>
-                  <span className="block text-sm font-medium">Remote Work Allowed</span>
+                  <span className="block text-sm font-medium">
+                    Remote Work Allowed
+                  </span>
                   <span className="mt-1 block text-xs text-muted-foreground">
                     Enable remote or distributed candidate applications
                   </span>
@@ -187,7 +205,9 @@ const NewJobsPage = () => {
                 <div>
                   <label htmlFor="location" className={labelClassName}>
                     Job Location{" "}
-                    <span className="text-xs text-muted-foreground">(optional)</span>
+                    <span className="text-xs text-muted-foreground">
+                      (optional)
+                    </span>
                   </label>
                   <div className="relative">
                     <MapPin
@@ -204,7 +224,8 @@ const NewJobsPage = () => {
                 </div>
                 <div>
                   <label htmlFor="deadline" className={labelClassName}>
-                    Application Deadline <span className="text-destructive">*</span>
+                    Application Deadline{" "}
+                    <span className="text-destructive">*</span>
                   </label>
                   <div className="relative">
                     <CalendarDays
@@ -280,7 +301,8 @@ const NewJobsPage = () => {
             <div className="space-y-5">
               <div>
                 <label htmlFor="responsibilities" className={labelClassName}>
-                  Key Responsibilities <span className="text-destructive">*</span>
+                  Key Responsibilities{" "}
+                  <span className="text-destructive">*</span>
                 </label>
                 <textarea
                   id="responsibilities"
