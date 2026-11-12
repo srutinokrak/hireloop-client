@@ -24,7 +24,7 @@ export function SiteNavbar() {
   // console.log('use session in navbar',session);
 
   const navLinks = [
-  { href: "/jobs", label: "Browse Jobs" },
+  { href: "/browse-jobs", label: "Browse Jobs" },
   { href: "/companies", label: "Company" },
   { href: "/pricing", label: "Pricing" },
   { href: `/dashboard/${session?.user.role || 'seeker'}`, label: "Dashboard" },
