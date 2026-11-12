@@ -16,3 +16,5 @@ export type JobDetails = {
   applicants: number
   status: JobStatus
 }
+
+// jobType=Part-time&remoteWork=true&category=Technology
