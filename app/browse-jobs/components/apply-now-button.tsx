@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { applyToAJob } from "@/lib/actions/applications"
+import { getApplicationsCount } from "@/lib/api/applications"
 import { useSession } from "@/lib/auth-client"
 import type { JobDetails } from "@/lib/types/jobs"
 import { useRouter } from "next/navigation"
@@ -18,9 +19,21 @@ export function ApplyNowButton({ job }: { job: ApplyJob }) {
       router.push(`/sign-in?redirectTo=/browse-jobs/${job._id}`)
     }
     else if(user.role === 'seeker'){
-      //save the application to the database
-      //TODO: only send jobId and userId or email address for the application
-      const application = {
+
+      // number of jobs applied by user
+      const countResult = await getApplicationsCount(`applicantId=${user.id}`)
+
+
+      // more than 10 and not premium user
+      if(countResult.count >=10){
+        // redirect to the page
+
+        router.push('/payment')
+        return
+      }
+
+      else{
+            const application = {
         jobId: job._id,
         userId : user.id,
         email: user.email,
@@ -38,6 +51,10 @@ export function ApplyNowButton({ job }: { job: ApplyJob }) {
         console.log("Application submitted successfully");
         router.push('/dashboard/seeker/applications')
        }
+      }
+      //save the application to the database
+      //TODO: only send jobId and userId or email address for the application
+   
     }
     else{
       console.log("user is not a job seeker");
