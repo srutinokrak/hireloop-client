@@ -1,6 +1,7 @@
 'use client'
 import { AuthForm } from '@/components/auth-form';
 import { authClient } from '@/lib/auth-client';
+import { useSearchParams } from 'next/navigation';
 type AuthformData = {
   name: string
   email: string
@@ -8,12 +9,17 @@ type AuthformData = {
 }
 
 const SignInPage = () => {
+
+    const searchParams = useSearchParams()
+    const redirectTo = searchParams.get("redirectTo") ?? "/"
+
+    console.log('redirectTo',redirectTo);
     const handleSignin = async (data:AuthformData) =>{
       const { data:SignInResponse, error } = await authClient.signIn.email({
     email: data.email, 
     password: data.password, 
     rememberMe:true,
-    callbackURL: '/', // An optional URL to redirect to after the user signs in. (optional)
+    callbackURL: redirectTo, // An optional URL to redirect to after the user signs in. (optional)
 });
 console.log('suign in response',SignInResponse,error);
     if (error) throw error; // sends the message to the form to show it

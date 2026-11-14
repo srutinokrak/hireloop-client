@@ -11,33 +11,8 @@ import {
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { getJobs } from "@/lib/api/jobs"
-import type { JobDetails } from "@/lib/types/jobs"
-
-type BrowseJob = JobDetails & { _id: string }
-
-function isBrowseJob(value: unknown): value is BrowseJob {
-  if (typeof value !== "object" || value === null || !("_id" in value)) {
-    return false
-  }
-
-  const job = value as Record<string, unknown>
-  return (
-    typeof job._id === "string" &&
-    typeof job.title === "string" &&
-    typeof job.company === "string" &&
-    typeof job.category === "string" &&
-    typeof job.jobType === "string" &&
-    typeof job.remoteWork === "boolean" &&
-    typeof job.location === "string" &&
-    typeof job.minimumSalary === "string" &&
-    typeof job.maximumSalary === "string" &&
-    typeof job.frequency === "string" &&
-    typeof job.deadline === "string" &&
-    typeof job.responsibilities === "string" &&
-    typeof job.qualifications === "string"
-  )
-}
+import { getJobById } from "@/lib/api/jobs"
+import { ApplyNowButton } from "../components/apply-now-button"
 
 export default async function JobDetailPage({
   params,
@@ -45,13 +20,8 @@ export default async function JobDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const response: unknown = await getJobs()
 
-  if (!Array.isArray(response)) {
-    throw new Error("The jobs service returned an invalid response.")
-  }
-
-  const job = response.filter(isBrowseJob).find((item) => item._id === id)
+  const job = await getJobById(id)
   if (!job) notFound()
 
   const salary = job.minimumSalary || job.maximumSalary
@@ -85,6 +55,8 @@ export default async function JobDetailPage({
     { title: "Responsibilities", text: job.responsibilities },
     { title: "Requirements", text: job.qualifications },
   ]
+
+
 
   return (
     <main className="min-h-screen bg-[#09090b] px-4 py-6 text-white sm:px-6 sm:py-8">
@@ -120,12 +92,7 @@ export default async function JobDetailPage({
             >
               <Bookmark aria-hidden="true" />
             </Button>
-            <Button
-              type="button"
-              className="h-9 bg-white px-5 text-zinc-900 hover:bg-zinc-200"
-            >
-              Apply Now
-            </Button>
+            <ApplyNowButton job={{ ...job, _id: id }} />
           </div>
         </header>
 
@@ -154,30 +121,35 @@ export default async function JobDetailPage({
             </section>
 
             <article className="rounded-xl border border-white/6 bg-[#141416] px-5 sm:px-6">
-              {sections.map((section) => (
-                <section
-                  key={section.title}
-                  className="border-b border-white/6 py-6 last:border-b-0"
-                >
-                  <h2 className="mb-4 text-base font-semibold">
-                    {section.title}
-                  </h2>
-                  {section.text.trim() ? (
-                    <ul className="list-disc space-y-2 pl-5 text-sm leading-6 text-zinc-400 marker:text-zinc-500">
-                      {section.text
+              {sections.map(({ title, text }) => {
+                const items =
+                  typeof text === "string"
+                    ? text
                         .split(/\r?\n/)
-                        .filter((line) => line.trim())
-                        .map((line, index) => (
-                          <li key={index}>{line.replace(/^[\s•*-]+/, "")}</li>
+                        .map((line) => line.replace(/^[\s•*-]+/, "").trim())
+                        .filter(Boolean)
+                    : []
+
+                return (
+                  <section
+                    key={title}
+                    className="border-b border-white/6 py-6 last:border-b-0"
+                  >
+                    <h2 className="mb-4 text-base font-semibold">{title}</h2>
+                    {items.length > 0 ? (
+                      <ul className="list-disc space-y-2 pl-5 text-sm leading-6 text-zinc-400 marker:text-zinc-500">
+                        {items.map((item, index) => (
+                          <li key={`${title}-${index}`}>{item}</li>
                         ))}
-                    </ul>
-                  ) : (
-                    <p className="text-sm text-zinc-500">
-                      Not provided by the employer.
-                    </p>
-                  )}
-                </section>
-              ))}
+                      </ul>
+                    ) : (
+                      <p className="text-sm text-zinc-500">
+                        Not provided by the employer.
+                      </p>
+                    )}
+                  </section>
+                )
+              })}
             </article>
           </div>
 
