@@ -25,13 +25,18 @@ export function ApplyNowButton({ job }: { job: ApplyJob }) {
         userId : user.id,
         email: user.email,
         jobTitle: job.title,
-        companyName: job.company
+        companyName: job.company,
+        jobType: job.jobType,
+        location: job.location,
+        remoteWork: job.remoteWork,
+        appliedAt: new Date().toISOString(),
+        status: "Applied" as const,
       }
 
        const result = await applyToAJob(application)
        if(result.insertedId){
         console.log("Application submitted successfully");
-        router.push('/browse-jobs')
+        router.push('/dashboard/seeker/applications')
        }
     }
     else{
