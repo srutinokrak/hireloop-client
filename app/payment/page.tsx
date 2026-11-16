@@ -1,18 +1,25 @@
-"use client"
-
-import { useState } from "react"
-import { ArrowLeft, Check, CreditCard, ShieldCheck, Sparkles } from "lucide-react"
+import {
+  ArrowLeft,
+  Check,
+  CreditCard,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react"
 import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
 
-export default function PaymentPage() {
-  const [isStartingCheckout, setIsStartingCheckout] = useState(false)
+export default async function PaymentPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ canceled?: string }>
+}) {
+  const { canceled } = await searchParams
 
-  function handlePay() {
-    setIsStartingCheckout(true)
-    // Replace with the Stripe Checkout redirect when it is implemented.
-    setIsStartingCheckout(false)
+  if (canceled) {
+    console.log(
+      "Order canceled -- continue to shop around and check out when you're ready."
+    )
   }
 
   return (
@@ -35,7 +42,8 @@ export default function PaymentPage() {
             Unlock more opportunities
           </h1>
           <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-zinc-400 sm:text-base">
-            Upgrade your plan to apply for more jobs and keep your search moving.
+            Upgrade your plan to apply for more jobs and keep your search
+            moving.
           </p>
         </div>
 
@@ -75,10 +83,7 @@ export default function PaymentPage() {
           <div className="p-6 sm:p-8">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">Payment summary</h2>
-              <CreditCard
-                aria-hidden="true"
-                className="size-5 text-zinc-400"
-              />
+              <CreditCard aria-hidden="true" className="size-5 text-zinc-400" />
             </div>
 
             <div className="mt-6 space-y-4 text-sm">
@@ -98,14 +103,20 @@ export default function PaymentPage() {
               </div>
             </div>
 
-            <Button
-              type="button"
-              onClick={handlePay}
-              disabled={isStartingCheckout}
-              className="mt-7 h-11 w-full bg-primary text-primary-foreground hover:bg-primary/90"
-            >
-              {isStartingCheckout ? "Preparing checkout..." : "Continue to payment"}
-            </Button>
+        
+
+            <form action="/api/checkout_sessions" method="POST">
+              <section>
+         
+                  <Button
+                type="submit" role="link"
+                    className="mt-7 h-11 w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
+                 Checkout<span>$9.99</span>
+                  </Button>
+             
+              </section>
+            </form>
 
             <p className="mt-4 flex items-center justify-center gap-2 text-center text-xs text-zinc-500">
               <ShieldCheck aria-hidden="true" className="size-4" />
