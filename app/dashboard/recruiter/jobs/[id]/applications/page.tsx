@@ -36,6 +36,7 @@ export default async function JobApplicationsPage({
     `jobId=${encodeURIComponent(id)}`
   )
 
+
   return (
     <main className="min-h-screen w-full min-w-0 flex-1 bg-background px-4 py-8 text-foreground sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">

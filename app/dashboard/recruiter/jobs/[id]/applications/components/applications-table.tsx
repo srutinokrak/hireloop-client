@@ -1,13 +1,11 @@
-import type { ApplicationStatus } from "@/lib/actions/applications"
+'use client'
+import { ApplicationStatusSelect } from "@/components/shared/application-status-select"
+import { StatusPill } from "@/components/shared/status-pill"
+import { updateApplicationStatus, type ApplicationStatus } from "@/lib/actions/applications"
 import type { ApplicationRecord } from "@/lib/api/applications"
+import { useState } from "react"
 
-const statusStyles: Record<ApplicationStatus, string> = {
-  Applied: "bg-zinc-700/50 text-zinc-300",
-  Review: "border border-amber-500/25 bg-amber-500/10 text-amber-400",
-  Shortlisted: "border border-blue-500/25 bg-blue-500/10 text-blue-400",
-  Rejected: "border border-red-500/25 bg-red-500/10 text-red-400",
-  Offered: "border border-emerald-500/25 bg-emerald-500/10 text-emerald-400",
-}
+
 
 function formatAppliedDate(value: string) {
   const date = new Date(value)
@@ -19,6 +17,20 @@ export function ApplicationsTable({
 }: {
   applications: ApplicationRecord[]
 }) {
+
+  const [statuses, setStatuses] = useState<Record<string, ApplicationStatus>>(() =>
+        Object.fromEntries(applications.map((app) => [app._id, app.status])),
+    )
+
+  const handleStatusChange = async (id: string, status: ApplicationStatus)=>{
+         const result = await updateApplicationStatus(id, { status });
+
+        console.log('update result', result);
+
+        if (result.modifiedCount > 0) {
+            setStatuses((prev) => ({ ...prev, [id]: status }))
+        }
+  }
   if (applications.length === 0) {
     return (
       <section className="rounded-xl border border-white/10 bg-card/40 px-6 py-12 text-center">
@@ -74,13 +86,17 @@ export function ApplicationsTable({
                     ? `${application.location} (Remote)`
                     : application.location}
                 </td>
-                <td className="px-5 py-4">
-                  <span
-                    className={`inline-flex rounded-full px-2.5 py-1 text-xs ${statusStyles[application.status]}`}
-                  >
-                    {application.status}
-                  </span>
-                </td>
+                    <td className="px-3 py-3.5">
+                                <StatusPill status={statuses[application._id] ?? application.status} />
+                            </td>
+
+              
+                       <td className="px-3 py-3.5">
+                                <ApplicationStatusSelect
+                                    value={statuses[application._id] ??application.status}
+                                    onChange={(status) => handleStatusChange(application._id, status)}
+                                />
+                            </td>
               </tr>
             ))}
           </tbody>

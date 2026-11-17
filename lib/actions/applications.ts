@@ -18,6 +18,7 @@ export type JobApplication = {
 export type ApplicationStatus =
   | "Applied"
   | "Review"
+  | "Interview"
   | "Shortlisted"
   | "Rejected"
   | "Offered"
@@ -36,4 +37,18 @@ export async function applyToAJob(data: JobApplication) {
   }
 
   return response.json()
+}
+
+
+
+
+export const updateApplicationStatus = async (id: string, data: { status: string }) => {
+    const response = await fetch(`${BASE_URL}/applications/${id}`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    })
+    return response.json()
 }
