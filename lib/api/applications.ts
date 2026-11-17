@@ -1,9 +1,16 @@
-import { JobApplication } from "../actions/applications"
+import type { JobApplication } from "../actions/applications"
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000"
 
-export const getApplications = async (query = ""): Promise<JobApplication[]> => {
+export type ApplicationRecord = JobApplication & {
+    _id: string
+}
+
+export const getApplications = async (query = ""): Promise<ApplicationRecord[]> => {
     const res = await fetch(`${BASE_URL}/applications?${query}`)
+    if (!res.ok) {
+        throw new Error(`Failed to load applications: ${res.status} ${res.statusText}`)
+    }
     return res.json()
 }
 export const getApplicationsCount = async (query = ""): Promise<{count: number}> => {

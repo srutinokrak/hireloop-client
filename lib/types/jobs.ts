@@ -1,8 +1,18 @@
 export type JobStatus = "Active" | "Expired"
 
+export type JobRecord = JobDetails & {
+  _id: string
+}
+
+export type ManagedJob = JobRecord & {
+  postedAgo: string
+}
+
 export type JobDetails = {
   title: string
   company: string
+  companyId?: string
+  recruiterId: string
   category: string
   jobType: string
   remoteWork: boolean

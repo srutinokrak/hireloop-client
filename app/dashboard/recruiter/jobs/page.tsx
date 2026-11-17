@@ -5,6 +5,7 @@ import {
   ArrowUpRight,
   BriefcaseBusiness,
   Building2,
+  ClipboardList,
   Globe2,
   MapPin,
   MoreVertical,
@@ -15,17 +16,10 @@ import {
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import type { JobDetails } from "@/lib/types/jobs"
+import type { JobDetails, ManagedJob } from "@/lib/types/jobs"
 import { getJobs } from "@/lib/api/jobs"
 import { DeleteJobDialog } from "@/app/components/DeleteJobDialog"
-
-export type ManagedJob = JobDetails & {
-  _id: string
-
-  postedAgo: string
-}
-
-
+import { getSession } from "@/lib/core/server"
 
 function formatCompensation(job: JobDetails) {
   const { minimumSalary, maximumSalary, frequency } = job
@@ -51,12 +45,16 @@ const categoryStyles: Record<string, string> = {
 
 export default async function ManageJobsPage() {
 
-  const jobs: ManagedJob[]  = await getJobs()
+
+  const session = await getSession()
+
+  const jobs: ManagedJob[] = await getJobs( `recruiterId=${encodeURIComponent(session?.user.id ?? "")}`)
 
   return (
     <main className="min-h-screen bg-background px-4 py-8 text-foreground sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div className="mb-6 flex flex-col ju
+        stify-between gap-4 sm:flex-row sm:items-end">
           <div>
             <p className="mb-2 text-xs text-muted-foreground">
               Manage Jobs <span className="px-1">›</span> Job Listings &amp; Postings
@@ -163,6 +161,21 @@ export default async function ManageJobsPage() {
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex items-center justify-end gap-1">
+                        <Button
+                          nativeButton={false}
+                          render={
+                            <Link
+                              href={`/dashboard/recruiter/jobs/${job._id}/applications`}
+                            />
+                          }
+                          variant="outline"
+                          size="sm"
+                          aria-label={`View applications for ${job.title}`}
+                          className="gap-1.5 border-primary/20 bg-primary/10 text-primary"
+                        >
+                          <ClipboardList aria-hidden="true" />
+                          View applications
+                        </Button>
                         <Button
                           type="button"
                           variant="outline"

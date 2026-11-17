@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils"
 import { createJob } from "@/lib/actions/jobs"
 import { toast } from "@/components/ui/toast"
 import { useRouter } from "next/navigation"
+import { useSession } from "@/lib/auth-client"
 
 const fieldClassName =
   "h-10 border-white/10 bg-[#18181b] text-sm placeholder:text-zinc-500"
@@ -25,13 +26,18 @@ const textareaClassName =
 const jobTypes = ["Full-time", "Part-time", "Contract", "Internship"] as const
 
 const NewJobsPage = () => {
+
+  const {data: session} = useSession()
+  
   const router = useRouter()
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     const formData = new FormData(event.currentTarget)
+    if (!session?.user?.id) return
     const jobDetails = {
       ...Object.fromEntries(formData.entries()),
+        recruiterId: session.user.id,
       remoteWork: formData.has("remoteWork"),
       applicants: 0,
       status: "Active",

@@ -1,13 +1,13 @@
-import { JobDetails } from "../types/jobs"
+import type { JobDetails, JobRecord, ManagedJob } from "../types/jobs"
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000"
 
-export const getJobs = async (query = ""): Promise<JobDetails> => {
+export const getJobs = async (query = ""): Promise<ManagedJob[]> => {
   const res = await fetch(`${BASE_URL}/jobs?${query}`)
   return res.json()
 }
 
-export const getJobById = async (jobId: string) => {
+export const getJobById = async (jobId: string): Promise<JobRecord | null> => {
   const res = await fetch(`${BASE_URL}/jobs/${encodeURIComponent(jobId)}`)
 
   if (res.status === 404) {
