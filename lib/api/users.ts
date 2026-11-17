@@ -13,7 +13,10 @@ export const getUsers = async()=>{
     },
     headers: await headers(),
 });
-  return users
+  return {
+    ...users,
+    fetchedAt: Date.now(),
+  }
 }
 
 export const getUserPremiumById = async(userId: string) =>{
