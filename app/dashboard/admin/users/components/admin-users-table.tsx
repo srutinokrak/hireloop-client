@@ -5,6 +5,7 @@ import { Download, Search, ShieldCheck, UserRound, Users } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
 import { Input } from "@/components/ui/input"
+import { updateUserRole } from "@/lib/actions/users"
 
 const roles = ["admin", "recruiter", "seeker"] as const
 type UserRole = (typeof roles)[number]
@@ -99,8 +100,14 @@ export function AdminUsersTable({
     return Number.isFinite(createdAt) && age >= 0 && age < 24 * 60 * 60 * 1000
   }).length
 
-  function handleRoleSelection(userId: string, role: UserRole) {
+ async function handleRoleSelection(userId: string, role: UserRole) {
     setRoleDrafts((current) => ({ ...current, [userId]: role }))
+
+    const res = await updateUserRole(userId,role)
+    console.log('response after update',res);
+    if(res.modifiedCount >0){
+       console.log('role updated successfully');
+    }
   }
 
   function handleExport() {

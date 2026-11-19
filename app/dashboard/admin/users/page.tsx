@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
 
 import { AdminUsersTable } from "./components/admin-users-table"
-import { getUsers } from "@/lib/api/users"
+import { getUsers } from "@/lib/actions/better-auth-user"
 import { getSession } from "@/lib/core/server"
 
 export default async function AdminUserPage() {
