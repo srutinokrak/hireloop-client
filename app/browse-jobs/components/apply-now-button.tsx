@@ -49,6 +49,8 @@ export function ApplyNowButton({ job }: { job: ApplyJob }) {
         }
 
         const result = await applyToAJob(application)
+        console.log('result',result);
+      
         if (result.insertedId) {
           console.log("Application submitted successfully")
          
