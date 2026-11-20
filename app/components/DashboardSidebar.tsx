@@ -16,6 +16,7 @@ import {
   Building2,
   CreditCard,
   FileText,
+  Home,
   LayoutDashboard,
   PlusCircle,
   Settings,
@@ -61,7 +62,24 @@ export function DashboardSidebar() {
   const role = session?.user?.role || "seeker"
   return (
     <Sidebar>
-      <SidebarHeader />
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton render={<Link href="/" />}>
+              <Home />
+              <span>Home</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+        <div className="px-2 py-2">
+          <p className="truncate text-sm font-medium">
+            {isPending ? "Loading..." : session?.user?.name || "User"}
+          </p>
+          <p className="text-xs capitalize text-muted-foreground">
+            {session?.user?.role || role}
+          </p>
+        </div>
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup />
 

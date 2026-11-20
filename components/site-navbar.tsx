@@ -20,6 +20,11 @@ export function SiteNavbar() {
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
   const { data: session } = useSession()
+  const user = session?.user
+  const profileImage =
+    user && "imageUrl" in user && typeof user.imageUrl === "string"
+      ? user.imageUrl
+      : user?.image
 
   // console.log('use session in navbar',session);
 
@@ -82,6 +87,14 @@ export function SiteNavbar() {
 
             {session?.user ? (
               <>
+                <Image
+                  src={profileImage || "/avatar-placeholder.svg"}
+                  alt={`${session.user.name}'s profile`}
+                  width={32}
+                  height={32}
+                  unoptimized
+                  className="size-8 rounded-full object-cover"
+                />
                 <span className="text-white">welcome, {session.user.name}</span>
                 <Button
                   onClick={handleSignOut}
@@ -118,6 +131,22 @@ export function SiteNavbar() {
             )}
           </div>
 
+          {session?.user && (
+            <Link
+              href={`/dashboard/${session.user.role || "seeker"}`}
+              aria-label="Open dashboard"
+              className="mr-2 size-8 overflow-hidden rounded-full lg:hidden"
+            >
+              <Image
+                src={profileImage || "/avatar-placeholder.svg"}
+                alt={`${session.user.name}'s profile`}
+                width={32}
+                height={32}
+                unoptimized
+                className="size-8 object-cover"
+              />
+            </Link>
+          )}
           <button
             type="button"
             aria-label={

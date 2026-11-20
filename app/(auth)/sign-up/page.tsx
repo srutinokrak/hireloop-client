@@ -8,7 +8,7 @@ type AuthformData = {
   name: string
   email: string
   password: string
-  role?: "seeker" | "recruiter" | "admin"
+  role?: "seeker" | "recruiter"
 }
 
 const SignUpPage = () => {

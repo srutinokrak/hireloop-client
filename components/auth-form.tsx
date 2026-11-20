@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, type ChangeEvent } from "react"
 import Link from "next/link"
 import { Eye, EyeOff, LockIcon, MailIcon, UserIcon } from "lucide-react"
 
@@ -16,19 +16,18 @@ const modes = [
 type Mode = (typeof modes)[number]["key"]
 
 // Everything the form collects and hands to the page (name only on sign up,
-// role is "seeker" | "recruiter" | "admin", stays "seeker" on sign in).
+// role is "seeker" | "recruiter", stays "seeker" on sign in).
 export type AuthFormData = {
   name: string
   email: string
   password: string
-  role: "seeker" | "recruiter" | "admin"
+  role: "seeker" | "recruiter"
 }
 
 // The pick-a-role pills shown on Sign Up.
 const roleOptions = [
   { value: "seeker", label: "Seeker" },
   { value: "recruiter", label: "Recruiter" },
-  { value: "admin", label: "Admin" },
 ] as const
 
 // Shared styles for the inputs.
@@ -48,6 +47,11 @@ export function AuthForm({
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showPassword, setShowPassword] = useState(false)
+  const [selectedImageName, setSelectedImageName] = useState("")
+
+  function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
+    setSelectedImageName(event.target.files?.[0]?.name ?? "")
+  }
 
   // 1. Collect every input inside the form by its name.
   function collectFormData(form: HTMLFormElement): AuthFormData {
@@ -122,6 +126,27 @@ export function AuthForm({
               placeholder="Full name"
               className={inputClass}
             />
+          </div>
+        )}
+
+        {mode === "signup" && (
+          <div className="flex flex-col gap-2">
+            <label htmlFor="profile-image" className="text-sm text-muted-foreground">
+              Profile image
+            </label>
+            <input
+              id="profile-image"
+              name="profileImage"
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="w-full text-sm text-muted-foreground file:mr-3 file:rounded-lg file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-sm file:text-foreground"
+            />
+            {selectedImageName && (
+              <p className="truncate text-xs text-muted-foreground">
+                Selected: {selectedImageName}
+              </p>
+            )}
           </div>
         )}
 

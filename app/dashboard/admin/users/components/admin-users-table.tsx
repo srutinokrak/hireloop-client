@@ -6,6 +6,8 @@ import type { LucideIcon } from "lucide-react"
 
 import { Input } from "@/components/ui/input"
 import { updateUserRole } from "@/lib/actions/users"
+import { useRouter } from "next/navigation"
+
 
 const roles = ["admin", "recruiter", "seeker"] as const
 type UserRole = (typeof roles)[number]
@@ -99,13 +101,14 @@ export function AdminUsersTable({
     const age = now - createdAt
     return Number.isFinite(createdAt) && age >= 0 && age < 24 * 60 * 60 * 1000
   }).length
-
+ const router = useRouter()
  async function handleRoleSelection(userId: string, role: UserRole) {
     setRoleDrafts((current) => ({ ...current, [userId]: role }))
-
     const res = await updateUserRole(userId,role)
     console.log('response after update',res);
+   
     if(res.modifiedCount >0){
+      router.refresh()
        console.log('role updated successfully');
     }
   }
